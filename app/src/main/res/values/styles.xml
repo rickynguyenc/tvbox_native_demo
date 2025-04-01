@@ -1,0 +1,44 @@
+<resources>
+    <!-- Base application theme that combines Leanback and AppCompat -->
+    <style name="AppTheme" parent="Theme.AppCompat.Leanback">
+        <item name="colorPrimary">@color/colorPrimary</item>
+        <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
+        <item name="colorAccent">@color/colorAccent</item>
+        <item name="android:windowBackground">@color/tv_background</item>
+    </style>
+
+    <!-- Login button style -->
+    <style name="LoginButton" parent="Widget.AppCompat.Button">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:padding">24dp</item>
+        <item name="android:textColor">@color/colorOnPrimary</item>
+        <item name="android:background">@drawable/button_background</item>
+        <item name="android:textSize">18sp</item>
+        <item name="android:focusable">true</item>
+        <item name="android:clickable">true</item>
+        <item name="android:minWidth">200dp</item>
+        <item name="android:minHeight">60dp</item>
+    </style>
+
+    <!-- Game card style -->
+    <style name="GameCardStyle" parent="Widget.Leanback.ImageCardView">
+        <item name="android:layout_width">300dp</item>
+        <item name="android:layout_height">200dp</item>
+        <item name="android:layout_margin">16dp</item>
+        <item name="cardBackgroundColor">@color/tv_card_background</item>
+        <item name="cardCornerRadius">8dp</item>
+        <item name="android:focusable">true</item>
+        <item name="android:clickable">true</item>
+    </style>
+
+    <!-- Add these to your existing styles -->
+    <style name="GameCardFocusAnimation">
+        <item name="android:duration">@android:integer/config_shortAnimTime</item>
+    </style>
+
+    <style name="GameCardFocusScale">
+        <item name="android:scaleX">1.05</item>
+        <item name="android:scaleY">1.05</item>
+    </style>
+</resources>
