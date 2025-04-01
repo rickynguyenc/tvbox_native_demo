@@ -10,6 +10,8 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import okhttp3.*
+import okhttp3.MediaType.Companion.toMediaType
+import okhttp3.RequestBody.Companion.toRequestBody
 import java.io.IOException
 
 class LoginFragment : Fragment() {
@@ -24,27 +26,25 @@ class LoginFragment : Fragment() {
         val view = inflater.inflate(R.layout.fragment_login, container, false)
 
         view.findViewById<Button>(R.id.loginButton).setOnClickListener {
-//            loginReq(mapOf("username" to "demoplay", "password" to "1111"),
-//                "https://gamedemo.vn/login")
-            activity?.runOnUiThread {
-                parentFragmentManager.beginTransaction()
-                    .replace(R.id.fragment_container, ListGameFragment())
-                    .commit()
-            }
+            loginReq(mapOf("username" to "0983000001", "password" to "pw123aA@"),
+                "https://viettel-cloud-gaming-customer-api.dft.vn/api/auth/login/no-captcha")
         }
 
         return view
     }
 
     private fun loginReq(credentials: Map<String, String>, url: String) {
-        val formBody = FormBody.Builder()
-            .add("username", credentials["username"] ?: "")
-            .add("password", credentials["password"] ?: "")
-            .build()
-
+//        val formBody = FormBody.Builder()
+//            .add("username", credentials["username"] ?: "")
+//            .add("password", credentials["password"] ?: "")
+//            .build()
+        val jsonBody = """
+    {"username": "${credentials["username"] ?: ""}", "password": "${credentials["password"] ?: ""}"}
+""".trimIndent()
+        val body = jsonBody.toRequestBody("application/json".toMediaType())
         val request = Request.Builder()
             .url(url)
-            .post(formBody)
+            .post(body)
             .build()
 
         CoroutineScope(Dispatchers.IO).launch {
