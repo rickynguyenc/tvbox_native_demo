@@ -112,7 +112,11 @@ class ListGameFragment : RowsSupportFragment() {
     }
 
     private fun playGame(game: Game) {
-
+        activity?.runOnUiThread {
+            parentFragmentManager.beginTransaction()
+                .replace(R.id.fragment_container, PlayGameFragment())
+                .commit()
+        }
     }
 
     data class Game(val title: String, val imageScreen: String, val id: String, val type:String)
