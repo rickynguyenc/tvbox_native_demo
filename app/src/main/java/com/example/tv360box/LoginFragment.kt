@@ -61,12 +61,12 @@ class LoginFragment : Fragment() {
         val view = inflater.inflate(R.layout.fragment_login, container, false)
 
         view.findViewById<Button>(R.id.loginButton).setOnClickListener {
-//            loginReq()
-            activity?.runOnUiThread {
-                parentFragmentManager.beginTransaction()
-                    .replace(R.id.fragment_container, ListGameFragment())
-                    .commit()
-            }
+            loginReq()
+//            activity?.runOnUiThread {
+//                parentFragmentManager.beginTransaction()
+//                    .replace(R.id.fragment_container, ListGameFragment())
+//                    .commit()
+//            }
         }
 
         return view
@@ -97,7 +97,7 @@ class LoginFragment : Fragment() {
         }
     }
     private fun saveAccessToken(accessToken: String) {
-        val sharedPreferences = requireContext().getSharedPreferences("MyPrefs", Context.MODE_PRIVATE)
+        val sharedPreferences = requireContext().getSharedPreferences("AppPrefs", Context.MODE_PRIVATE)
         with(sharedPreferences.edit()) {
             putString("access_token", accessToken)
             apply() // Use apply() for asynchronous saving

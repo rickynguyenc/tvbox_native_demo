@@ -19,7 +19,12 @@ import retrofit2.http.Body
 import retrofit2.http.GET
 import retrofit2.http.Headers
 import retrofit2.http.POST
-
+data class PlayToken (
+    val expiresAt: Long,
+    val expiresIn: Long,
+    val accessToken: String,
+    val refreshToken:String,
+)
 interface GamePlayAPI {
     //    @FormUrlEncoded
 //    @POST("api/auth/login/no-captcha") // Replace with your endpoint
@@ -28,9 +33,9 @@ interface GamePlayAPI {
 //        @Field("password") password: String
 //    ): LoginResponse
     @Headers("Content-Type: application/json")
-    @GET("/api/game/enduser/blacknut/access-token-v2")
+    @GET("api/game/enduser/blacknut/access-token-v2")
     suspend fun getGamePlayToken(
-    ): LoginResponse
+    ): PlayToken
 
 
 }
@@ -51,7 +56,12 @@ class PlayGameFragment : Fragment() {
             .build()
             .create(GamePlayAPI::class.java)
     }
-
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        // Retrieve the GameItem from arguments
+        gameData = arguments?.getParcelable("gameItem")
+            ?: throw IllegalArgumentException("GameItem is required")
+    }
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -63,13 +73,10 @@ class PlayGameFragment : Fragment() {
         webView.settings.apply {
             javaScriptEnabled = true
             domStorageEnabled = true
-            databaseEnabled = true
             builtInZoomControls = true
             displayZoomControls = false
             allowFileAccess = true
             allowContentAccess = true
-            allowFileAccessFromFileURLs = true
-            allowUniversalAccessFromFileURLs = true
         }
 
         // Set WebViewClient to handle page navigation within the WebView
@@ -81,7 +88,7 @@ class PlayGameFragment : Fragment() {
         }
 
         // Load a webpage
-        webView.loadUrl("https://cloudgame.vn")
+        getTokenAndLoadWebView()
         return view
     }
 
@@ -92,7 +99,7 @@ class PlayGameFragment : Fragment() {
                 val response = api2.getGamePlayToken()
                 // Assuming LoginResponse contains a token you need to use
                 // You might want to add it to the URL or headers
-                val urlWithToken = "https://cloudgame.vn/play/blacknut/e64b0776-6131-499a-b9e7-7dd712cca329?accessToken=${response.accessToken}&refreshToken=${response.refreshToken}&partnerGameId=" // Adjust based on your API needs
+                val urlWithToken = "https://cloudgame.vn/play/blacknut/${gameData?.id}?accessToken=${response.accessToken}&refreshToken=${response.refreshToken}&partnerGameId=${gameData?.partnerGameId}" // Adjust based on your API needs
                 webView.loadUrl(urlWithToken)
             } catch (e: Exception) {
                 // Handle error (show toast, error message, etc.)

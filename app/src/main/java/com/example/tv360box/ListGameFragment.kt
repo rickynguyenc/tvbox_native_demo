@@ -91,7 +91,7 @@ class ListGameFragment : RowsSupportFragment() {
         gameAdapter.addAll(0, games)
 
         // Add the games to a row
-        val header = HeaderItem(0, "Games")
+        val header = HeaderItem(0, "Danh sách Games")
         rowsAdapter.add(ListRow(header, gameAdapter))
 
         adapter = rowsAdapter
@@ -105,11 +105,25 @@ class ListGameFragment : RowsSupportFragment() {
     }
 
     private fun playGame(game: Game) {
+
+        val playGameFragment = PlayGameFragment()
+
+        // Create a Bundle and put the GameItem
+        val bundle = Bundle().apply {
+            putParcelable("gameItem", game)
+        }
+
+        // Set the arguments to the fragment
+        playGameFragment.arguments = bundle
+
+        // Perform the fragment transaction on UI thread
         activity?.runOnUiThread {
             parentFragmentManager.beginTransaction()
-                .replace(R.id.fragment_container, PlayGameFragment())
+                .replace(R.id.fragment_container, playGameFragment)
+                .addToBackStack(null) // Optional: adds to back stack for navigation
                 .commit()
         }
+
     }
     @SuppressLint("ParcelCreator")
     data class Game(val title: String, val imageScreen: String, val id: String, val type:String, val partnerGameId: String) :Parcelable {

@@ -8,11 +8,11 @@
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="32dp"
-        android:layout_marginTop="32dp"
+        android:layout_marginStart="56dp"
+        android:layout_marginTop="56dp"
         android:text="@string/game_list_title"
         android:textColor="@color/tv_text_primary"
-        android:textSize="24sp" />
+        android:textSize="36sp" />
 
     <androidx.leanback.widget.HorizontalGridView
         android:id="@+id/gamesGridView"
