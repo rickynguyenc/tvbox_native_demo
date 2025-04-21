@@ -1,6 +1,7 @@
 package com.example.tv360box
 
 import android.annotation.SuppressLint
+import android.content.Intent
 import android.os.Bundle
 import android.os.Parcel
 import android.os.Parcelable
@@ -105,24 +106,27 @@ class ListGameFragment : RowsSupportFragment() {
     }
 
     private fun playGame(game: Game) {
+        val intent = Intent(context, PlayGameActivity::class.java)
+        intent.putExtra("gameItem", game)
+        startActivity(intent)
 
-        val playGameFragment = PlayGameFragment()
-
-        // Create a Bundle and put the GameItem
-        val bundle = Bundle().apply {
-            putParcelable("gameItem", game)
-        }
-
-        // Set the arguments to the fragment
-        playGameFragment.arguments = bundle
-
-        // Perform the fragment transaction on UI thread
-        activity?.runOnUiThread {
-            parentFragmentManager.beginTransaction()
-                .replace(R.id.fragment_container, playGameFragment)
-                .addToBackStack(null) // Optional: adds to back stack for navigation
-                .commit()
-        }
+//        val playGameFragment = PlayGameFragment()
+//
+//        // Create a Bundle and put the GameItem
+//        val bundle = Bundle().apply {
+//            putParcelable("gameItem", game)
+//        }
+//
+//        // Set the arguments to the fragment
+//        playGameFragment.arguments = bundle
+//
+//        // Perform the fragment transaction on UI thread
+//        activity?.runOnUiThread {
+//            parentFragmentManager.beginTransaction()
+//                .replace(R.id.fragment_container, playGameFragment)
+//                .addToBackStack(null) // Optional: adds to back stack for navigation
+//                .commit()
+//        }
 
     }
     @SuppressLint("ParcelCreator")

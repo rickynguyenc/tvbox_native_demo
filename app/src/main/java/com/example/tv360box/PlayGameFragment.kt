@@ -2,51 +2,43 @@ package com.example.tv360box
 
 import AuthInterceptor
 import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
+import android.view.KeyEvent
+import android.webkit.WebChromeClient
+import android.webkit.WebResourceRequest
+import android.webkit.WebSettings
 import android.webkit.WebView
 import android.webkit.WebViewClient
-import android.widget.Button
-import androidx.fragment.app.Fragment
+import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
 import com.example.tv360box.ListGameFragment.Game
 import kotlinx.coroutines.launch
 import okhttp3.OkHttpClient
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
-import retrofit2.http.Body
 import retrofit2.http.GET
 import retrofit2.http.Headers
-import retrofit2.http.POST
+
 data class PlayToken (
     val expiresAt: Long,
     val expiresIn: Long,
     val accessToken: String,
-    val refreshToken:String,
+    val refreshToken: String,
 )
+
 interface GamePlayAPI {
-    //    @FormUrlEncoded
-//    @POST("api/auth/login/no-captcha") // Replace with your endpoint
-//    suspend fun login(
-//        @Field("username") username: String,
-//        @Field("password") password: String
-//    ): LoginResponse
     @Headers("Content-Type: application/json")
     @GET("api/game/enduser/blacknut/access-token-v2")
-    suspend fun getGamePlayToken(
-    ): PlayToken
-
-
+    suspend fun getGamePlayToken(): PlayToken
 }
-class PlayGameFragment : Fragment() {
+
+class PlayGameActivity : AppCompatActivity() {
 
     private lateinit var webView: WebView
     private var gameData: Game? = null
 
     private val api2 by lazy {
         val okHttpClient = OkHttpClient.Builder()
-            .addInterceptor(AuthInterceptor(requireContext()))
+            .addInterceptor(AuthInterceptor(this))
             .build()
 
         Retrofit.Builder()
@@ -56,57 +48,78 @@ class PlayGameFragment : Fragment() {
             .build()
             .create(GamePlayAPI::class.java)
     }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        // Retrieve the GameItem from arguments
-        gameData = arguments?.getParcelable("gameItem")
-            ?: throw IllegalArgumentException("GameItem is required")
-    }
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View? {
-        val view = inflater.inflate(R.layout.fragment_play_game, container, false)
+        setContentView(R.layout.fragment_play_game) // Note: You'll need to create this layout
 
-        webView = view.findViewById(R.id.webView)
+        // Retrieve the GameItem from intent
+        gameData = intent.getParcelableExtra("gameItem")
+            ?: throw IllegalArgumentException("GameItem is required")
+
+        webView = findViewById(R.id.webview)
+        setupWebView()
+        getTokenAndLoadWebView()
+    }
+
+    private fun setupWebView() {
         webView.settings.apply {
             javaScriptEnabled = true
             domStorageEnabled = true
-            builtInZoomControls = true
-            displayZoomControls = false
-            allowFileAccess = true
+            databaseEnabled = true
             allowContentAccess = true
+            allowFileAccess = true
+            useWideViewPort = true
+            loadWithOverviewMode = true
+            javaScriptCanOpenWindowsAutomatically = true
+            mediaPlaybackRequiresUserGesture = false
+            setSupportMultipleWindows(true)
         }
 
-        // Set WebViewClient to handle page navigation within the WebView
+        webView.webChromeClient = WebChromeClient()
+
         webView.webViewClient = object : WebViewClient() {
-            override fun shouldOverrideUrlLoading(view: WebView?, url: String?): Boolean {
-                view?.loadUrl(url ?: return false)
-                return true
+            override fun shouldOverrideUrlLoading(
+                view: WebView,
+                request: WebResourceRequest
+            ): Boolean {
+                return false
             }
         }
-
-        // Load a webpage
-        getTokenAndLoadWebView()
-        return view
     }
 
     private fun getTokenAndLoadWebView() {
-        // Use viewLifecycleOwner.lifecycleScope to ensure the coroutine is canceled when the fragment is destroyed
-        viewLifecycleOwner.lifecycleScope.launch {
+        lifecycleScope.launch {
             try {
                 val response = api2.getGamePlayToken()
-                // Assuming LoginResponse contains a token you need to use
-                // You might want to add it to the URL or headers
-                val urlWithToken = "https://cloudgame.vn/play/blacknut/${gameData?.id}?accessToken=${response.accessToken}&refreshToken=${response.refreshToken}&partnerGameId=${gameData?.partnerGameId}" // Adjust based on your API needs
+                val urlWithToken = "https://cloudgame.vn/play/blacknut/${gameData?.id}?accessToken=${response.accessToken}&refreshToken=${response.refreshToken}&partnerGameId=${gameData?.partnerGameId}"
                 webView.loadUrl(urlWithToken)
             } catch (e: Exception) {
-                // Handle error (show toast, error message, etc.)
-                // Fallback - load the URL without token if the API fails
-                webView.loadUrl("https://cloudgame.vn")
+                e.printStackTrace()
             }
         }
     }
 
+    override fun onPause() {
+        super.onPause()
+        webView.onPause()
+    }
+
+    override fun onResume() {
+        super.onResume()
+        webView.onResume()
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        webView.destroy()
+    }
+
+    override fun onBackPressed() {
+        if (webView.canGoBack()) {
+            webView.goBack()
+        } else {
+            super.onBackPressed()
+        }
+    }
 }
